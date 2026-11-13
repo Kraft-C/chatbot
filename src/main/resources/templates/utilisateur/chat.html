@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main}, 'PAWLY - Nouveau chat')}">
+<body>
+<main th:fragment="main" class="chat-layout">
+    <aside class="sidebar">
+        <a class="sidebar-brand" th:href="@{/chat}">
+            <!-- À AJOUTER : place ton logo/avatar dans static/img/pawly-avatar.png -->
+            <img th:src="@{/img/pawly-avatar.png}" alt="" onerror="this.style.display='none'">
+            <span>PAWLY</span>
+        </a>
+
+        <nav class="sidebar-nav" aria-label="Navigation principale">
+            <a class="sidebar-link active" th:href="@{/chat}"><i class="bi bi-chat-square-text"></i> Nouveau chat</a>
+            <a class="sidebar-link" href="#" aria-disabled="true"><i class="bi bi-clock-history"></i> Mes conversations</a>
+            <a class="sidebar-link" href="#" aria-disabled="true"><i class="bi bi-gear"></i> Paramètres</a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a class="sidebar-link" href="#" aria-disabled="true"><i class="bi bi-info-circle"></i> À propos</a>
+        </div>
+    </aside>
+
+    <section class="chat-main">
+        <div class="chat-top-actions">
+            <button class="icon-button" type="button" aria-label="Thème"><i class="bi bi-sun"></i></button>
+            <button class="icon-button" type="button" aria-label="Profil"><i class="bi bi-person"></i></button>
+        </div>
+
+        <div class="chat-welcome">
+            <!-- À AJOUTER : logo PAWLY transparent conseillé, dans static/img/pawly-mark.png -->
+            <img class="pawly-mark" th:src="@{/img/pawly-mark.png}" alt=""
+                 onerror="this.style.display='none'">
+            <h1>PAWLY</h1>
+            <p>Votre compagnon IA, toujours à vos côtés !</p>
+            <div class="welcome-divider"><span></span><i class="bi bi-paw"></i><span></span></div>
+        </div>
+
+        <div class="chat-composer-wrap">
+            <form id="chatForm" class="chat-composer">
+                <label class="visually-hidden" for="messageInput">Votre message</label>
+                <textarea id="messageInput" rows="1" placeholder="Posez votre question à PAWLY..."
+                          maxlength="4000" required></textarea>
+                <button type="submit" aria-label="Envoyer le message"><i class="bi bi-arrow-up"></i></button>
+            </form>
+            <div class="suggestions">
+                <button type="button" data-prompt="Explique-moi ce code :"><i class="bi bi-code-slash"></i> Explique-moi ce code</button>
+                <button type="button" data-prompt="Donne-moi des idées sur le sujet suivant :"><i class="bi bi-lightbulb"></i> Donne-moi des idées</button>
+                <button type="button" data-prompt="Aide-moi à apprendre :"><i class="bi bi-mortarboard"></i> Aide-moi à apprendre</button>
+            </div>
+            <p class="chat-notice">PAWLY peut faire des erreurs. Pensez à vérifier les informations importantes.</p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content, pageTitle)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle} ?: 'PAWLY'">PAWLY</title>
+
+    <!-- Bootstrap local -->
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap/css/bootstrap.min.css}">
+    <!-- Bootstrap Icons local -->
+    <link rel="stylesheet" th:href="@{/vendor/bootstrap-icons/font/bootstrap-icons.css}">
+    <!-- Polices : Poppins, Inter et JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/pawly.css}">
+</head>
+<body>
+<div th:if="${showHeader == true}" th:replace="~{fragment/header :: header}"></div>
+
+<main th:replace="${content}">
+    <!-- Le contenu de chaque page est injecté ici par Thymeleaf. -->
+</main>
+
+<div th:if="${showHeader == true}" th:replace="~{fragment/footer :: footer}"></div>
+
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/pawly.js}"></script>
+</body>
+</html>

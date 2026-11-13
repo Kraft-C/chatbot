@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="header" class="app-header">
+    <a class="brand" th:href="@{/chat}" aria-label="PAWLY - Accueil">
+        <!-- À AJOUTER : place ton logo dans static/img/pawly-logo.png -->
+        <img th:src="@{/img/pawly-logo.png}" alt="Logo PAWLY" class="brand-logo"
+             onerror="this.style.display='none'">
+        <span>PAWLY</span>
+    </a>
+    <div class="header-actions">
+        <span class="header-status"><span class="status-dot"></span> Espace de travail</span>
+        <button class="icon-button" type="button" aria-label="Paramètres" title="Paramètres">
+            <i class="bi bi-gear"></i>
+        </button>
+        <button class="icon-button" type="button" aria-label="Profil" title="Profil">
+            <i class="bi bi-person-circle"></i>
+        </button>
+    </div>
+</header>
+</body>
+</html>
