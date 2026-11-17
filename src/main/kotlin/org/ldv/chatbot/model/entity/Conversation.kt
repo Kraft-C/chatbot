@@ -4,9 +4,8 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 /**
- * Représente une conversation entre un utilisateur et un modèle IA.
- * Relation N:1 avec Utilisateur.
- * Relation de composition 1:N avec Message.
+ * Une conversation appartient à un utilisateur, utilise éventuellement un modèle IA
+ * et contient plusieurs messages.
  */
 @Entity
 @Table(name = "conversation")
@@ -19,46 +18,49 @@ class Conversation(
     var titre: String,
 
     @Column(nullable = false)
-    var dateCreation: LocalDateTime,
+    var dateCreation: LocalDateTime = LocalDateTime.now(),
 
-    /**
-     * Relation Many-to-One : Plusieurs conversations pour un seul utilisateur.
-     * Côté propriétaire de la relation.
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "utilisateur_id", nullable = false)
-    var utilisateur: Utilisateur,
+    @Column(nullable = false)
+    var dateDerniereModification: LocalDateTime = LocalDateTime.now(),
 
-    /**
-     * Relation One-to-Many : Une conversation contient plusieurs messages.
-     * C'est une composition, donc CascadeType.ALL est approprié pour que les messages soient supprimés avec la conversation.
-     * orphanRemoval = true assure que si un message est retiré de la liste, il est supprimé de la base de données.
-     * mappedBy = "conversation" fait référence à la propriété dans la classe Message.
-     */
+    // Plusieurs conversations peuvent appartenir au même utilisateur.
+    // Conversation est propriétaire de cette relation.
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "utilisateur_id", nullable = true)
+    var utilisateur: Utilisateur? = null,
+
+    // Une conversation est composée de ses messages.
     @OneToMany(mappedBy = "conversation", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val messages: MutableList<Message> = mutableListOf(),
+    var messages: MutableList<Message> = mutableListOf(),
 
-    /**
-     * Une conversation utilise un et un seul modèle IA à la fois.
-     * (Basé sur la flèche dans le diagramme qui part de Conversation vers ModeleIA).
-     */
+    // Une conversation peut être associée à un modèle IA.
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modele_ia_id") // Peut être null initialement si la conversation n'a pas encore sélectionné de modèle.
+    @JoinColumn(name = "modele_ia_id")
     var modeleIA: ModeleIA? = null
-
 ) {
-    // Méthodes du diagramme
-
-    fun ajouterMessage(contenu: String, role: RoleMessage): Message {
-        // TODO : Créer un nouveau Message, l'associer à cette conversation (this), l'ajouter à la liste et le retourner.
-        val nouveauMessage =
-            Message(contenu = contenu, dateEnvoi = LocalDateTime.now(), role = role, conversation = this)
-        messages.add(nouveauMessage)
-        return nouveauMessage
+    fun ajouterMessage(contenu: String, typeMessage: TypeMessage): Message {
+        val message = Message(
+            contenu = contenu,
+            dateCreation = LocalDateTime.now(),
+            typeMessage = typeMessage,
+            conversation = this
+        )
+        messages.add(message)
+        return message
     }
 
-    fun consulterMessages(): List<Message> {
-        // TODO : Retourner la liste des messages triés par dateEnvoi
-        return this.messages.sortedBy { it.dateEnvoi }
+    fun retirerMessage(message: Message) {
+        messages.remove(message)
     }
+
+    fun changerModeleIA(nouveauModele: ModeleIA?) {
+        modeleIA?.conversations?.remove(this)
+        modeleIA = nouveauModele
+        if (nouveauModele != null && !nouveauModele.conversations.contains(this)) {
+            nouveauModele.conversations.add(this)
+        }
+    }
+
+    fun consulterMessages(): List<Message> =
+        messages.sortedBy { it.dateCreation }
 }

@@ -1,7 +1,8 @@
 package org.ldv.chatbot.model.dao
 
-import org.ldv.chatbot.model.entity.Message
+import org.ldv.chatbot.model.entity.FournisseurIA
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface FourniseurIADAO : JpaRepository<Message, Long> {
+interface FournisseurIADAO : JpaRepository<FournisseurIA, Long> {
+    fun findByNomIgnoreCase(nom: String): FournisseurIA?
 }

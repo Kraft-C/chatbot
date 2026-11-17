@@ -3,8 +3,7 @@ package org.ldv.chatbot.model.entity
 import jakarta.persistence.*
 
 /**
- * Représente une entreprise ou une plateforme qui propose des modèles IA.
- * Relation 1:* avec ModeleIA.
+ * Entreprise ou plateforme proposant des modèles d'intelligence artificielle.
  */
 @Entity
 @Table(name = "fournisseur_ia")
@@ -16,17 +15,21 @@ class FournisseurIA(
     @Column(nullable = false, unique = true)
     var nom: String,
 
-    /**
-     * Un fournisseur propose un ou plusieurs modèles IA.
-     * mappedBy = "fournisseurIA" fait référence à la propriété dans la classe ModeleIA.
-     */
-    @OneToMany(mappedBy = "fournisseurIA", fetch = FetchType.LAZY)
-    var modelesIA: MutableList<ModeleIA> = mutableListOf()
+    // Le fournisseur est le côté inverse : la clé étrangère est dans ModeleIA.
+    @OneToMany(
+        mappedBy = "fournisseurIA",
+        cascade = [CascadeType.PERSIST, CascadeType.MERGE]
+    )
+    var modelesIA: MutableList<ModeleIA> = mutableListOf(),
+    cheminLogo: String,
+    description: String
 ) {
-    // Méthode du diagramme
+    fun ajouterModele(modele: ModeleIA) {
+        modelesIA.add(modele)
+        modele.fournisseurIA = this
+    }
 
-    fun envoyerRequete() {
-        // TODO : Logique d'envoi de requête au fournisseur (probablement pour interagir avec son API)
-        println("Envoi de requête au fournisseur $nom...")
+    fun retirerModele(modele: ModeleIA) {
+        modelesIA.remove(modele)
     }
 }

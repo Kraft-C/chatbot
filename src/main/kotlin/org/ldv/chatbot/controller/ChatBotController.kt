@@ -11,9 +11,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 @Controller
 class ChatBotController {
 
-    @GetMapping("/")
-    fun accueil(): String = "redirect:/connexion"
-
     @GetMapping("/connexion")
     fun afficherConnexion(model: Model): String {
         model.addAttribute("showHeader", false)
@@ -41,11 +38,5 @@ class ChatBotController {
         return "redirect:/connexion"
     }
 
-    @GetMapping("/chat")
-    fun afficherChat(model: Model): String {
-        model.addAttribute("showHeader", false)
-        model.addAttribute("pageTitle", "PAWLY - Nouveau chat")
-        model.addAttribute("activePage", "chat")
-        return "utilisateur/chat"
-    }
+
 }

@@ -4,9 +4,7 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 /**
- * Représente un message individuel dans une conversation.
- * Relation N:1 avec Conversation.
- * Utilise l'énumération RoleMessage.
+ * Message envoyé dans une conversation.
  */
 @Entity
 @Table(name = "message")
@@ -15,25 +13,17 @@ class Message(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
-    @Column(nullable = false, columnDefinition = "TEXT") // TEXT pour supporter les longs textes
+    @Column(nullable = false, columnDefinition = "TEXT")
     var contenu: String,
 
     @Column(nullable = false)
-    var dateEnvoi: LocalDateTime,
+    var dateCreation: LocalDateTime = LocalDateTime.now(),
 
-    /**
-     * Stocke le rôle du message (UTILISATEUR ou ASSISTANT) sous forme de chaîne de caractères en base.
-     */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    var role: RoleMessage,
+    @Column(nullable = false, length = 20)
+    var typeMessage: TypeMessage,
 
-    /**
-     * Relation Many-to-One : Plusieurs messages pour une seule conversation.
-     */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "conversation_id", nullable = false)
     var conversation: Conversation
 )
-
-
