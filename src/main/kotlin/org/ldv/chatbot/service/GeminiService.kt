@@ -38,7 +38,7 @@ class GeminiService(
 
         val response = client.post()
             .uri(modele.urlAPI)
-            .header("Authorization", "Bearer $apiKey")
+            .header("x-goog-api-key", apiKey)
             .contentType(MediaType.APPLICATION_JSON)
             .body(request)
             .retrieve()
