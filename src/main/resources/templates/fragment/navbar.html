@@ -16,22 +16,36 @@
     <nav class="sidebar-nav">
         <a th:href="@{/}" class="sidebar-link sidebar-link--primary">
             <i class="bi bi-chat-dots"></i> Nouveau chat
+            <a th:href="@{/connexion}" class="sidebar-link">
+                <i class="bi bi-person"></i> Connexion
+            </a>
         </a>
     </nav>
 
     <div class="sidebar-section">
         <h2 class="sidebar-section-title"><i class="bi bi-chat-left-text"></i> Mes conversations</h2>
         <div class="conversation-list">
-            <a th:each="conv : ${conversations}"
-               th:href="@{/conversations/{id}(id=${conv.id})}"
-               th:text="${conv.titre}"
-               th:title="${conv.titre}"
-               th:classappend="${conversation != null and conversation.id == conv.id} ? 'is-active' : ''"
-               class="conversation-link">
-            </a>
-            <p class="conversation-empty" th:if="${conversations == null or conversations.isEmpty()}">
-                Aucune conversation pour le moment.
-            </p>
+            <!-- remplacer par la div de en dessous
+            <a th:each="conv : ${conversations}"-->
+            <div class="conversation-list">
+                <div th:each="conv : ${conversations}" class="conversation-item">
+                    <a th:href="@{/conversations/{id}(id=${conv.id})}"
+                       th:text="${conv.titre}"
+                       th:title="${conv.titre}"
+                       th:classappend="${conversation != null and conversation.id == conv.id} ? 'is-active' : ''"
+                       class="conversation-link">
+                    </a>
+                    <form th:action="@{/conversations/{id}/supprimer(id=${conv.id})}" method="post"
+                          class="conversation-delete-form" data-confirm="Supprimer cette conversation ?">
+                        <button type="submit" class="conversation-delete" aria-label="Supprimer la conversation" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+                <p class="conversation-empty" th:if="${conversations == null or conversations.isEmpty()}">
+                    Aucune conversation pour le moment.
+                </p>
+            </div>
         </div>
     </div>
 
@@ -43,6 +57,12 @@
             <i class="bi bi-info-circle"></i> À propos
         </a>
     </div>
+
+    <footer class="sidebar-footer">
+        <strong>PAWLY</strong>
+        <span>Votre compagnon IA, toujours à vos côtés !</span>
+    </footer>
+
 </aside>
 </body>
 </html>

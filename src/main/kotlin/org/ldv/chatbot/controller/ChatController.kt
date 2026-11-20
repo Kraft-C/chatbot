@@ -175,5 +175,18 @@ class ChatController(
 
         return "redirect:/conversations/$id"
     }
+
+    // Suppression d'une conversation (ses messages sont supprimés en cascade)
+    @PostMapping("/conversations/{id}/supprimer")
+    fun supprimerConversation(@PathVariable id: Long): String {
+
+        if (!conversationDAO.existsById(id)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        conversationDAO.deleteById(id)
+
+        return "redirect:/"
+    }
 }
 

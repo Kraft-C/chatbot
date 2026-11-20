@@ -324,8 +324,14 @@ code, pre { font-family: var(--pawly-font-code); }
 .chat-layout {
     position: relative;
     flex: 1;
+    min-height: 0;
     display: flex;
     width: 100%;
+    overflow: hidden;
+}
+
+/* Page de chat : la page fait exactement la hauteur de l'écran, seule la zone des messages défile */
+body:has(.chat-layout) {
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
@@ -341,6 +347,8 @@ code, pre { font-family: var(--pawly-font-code); }
     padding: 24px 14px 14px;
     background: linear-gradient(180deg, #241a21, #1e161c);
     border-right: 1px solid var(--pawly-border);
+    overflow: hidden;
+    transition: margin-left .22s ease, visibility 0s;
 }
 .sidebar-brand {
     display: flex;
@@ -413,6 +421,41 @@ code, pre { font-family: var(--pawly-font-code); }
     background: rgba(168, 50, 80, .35);
     border-color: var(--pawly-border-strong);
 }
+
+.conversation-item { position: relative; }
+.conversation-item .conversation-link { padding-right: 40px; }
+.conversation-item:hover .conversation-link { background: var(--pawly-surface-3); color: #fff; }
+.conversation-item .conversation-link.is-active:hover { background: rgba(168, 50, 80, .35); }
+
+.conversation-delete-form { margin: 0; }
+.conversation-delete {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--pawly-muted);
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity .15s, background .15s, color .15s;
+}
+.conversation-item:hover .conversation-delete,
+.conversation-delete:focus-visible { opacity: 1; }
+.conversation-delete:hover { background: var(--pawly-accent-soft); color: var(--pawly-danger); }
+
+/* Écrans tactiles : pas de survol, on garde la poubelle visible */
+@media (hover: none) {
+    .conversation-delete { opacity: 1; }
+}
+
 .conversation-empty { margin: 4px 14px; color: var(--pawly-faint); font-size: 12px; }
 
 .sidebar-bottom {
@@ -421,6 +464,23 @@ code, pre { font-family: var(--pawly-font-code); }
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--pawly-border);
+}
+
+.sidebar-footer {
+    display: grid;
+    gap: 2px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--pawly-border);
+    color: var(--pawly-muted);
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: center;
+}
+.sidebar-footer strong {
+    font-family: var(--pawly-font-title);
+    color: var(--pawly-accent);
+    letter-spacing: .06em;
 }
 
 .sidebar-backdrop { display: none; }
@@ -445,7 +505,16 @@ code, pre { font-family: var(--pawly-font-code); }
     padding: 16px 22px 0;
 }
 .chat-topbar-actions { display: flex; gap: 10px; margin-left: auto; }
-.sidebar-toggle { display: none; }
+.sidebar-toggle { display: inline-grid; }
+
+/* Barre latérale réduite (ordinateur) */
+@media (min-width: 861px) {
+    .chat-layout.is-sidebar-collapsed .sidebar {
+        margin-left: calc(-1 * var(--pawly-sidebar-width));
+        visibility: hidden;
+        transition: margin-left .22s ease, visibility 0s .22s;
+    }
+}
 
 .chat-scroll {
     flex: 1;
@@ -519,7 +588,7 @@ code, pre { font-family: var(--pawly-font-code); }
 
 .composer {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 10px;
     padding: 9px 9px 9px 20px;
     border: 1px solid var(--pawly-border-strong);
@@ -532,17 +601,40 @@ code, pre { font-family: var(--pawly-font-code); }
     border-color: var(--pawly-accent);
     box-shadow: 0 0 0 3px rgba(242, 106, 131, .14), 0 10px 36px rgba(0, 0, 0, .3), 0 0 30px rgba(168, 50, 80, .22);
 }
-.composer input[type="text"] {
+.composer textarea {
     flex: 1;
     min-width: 0;
     height: 40px;
+    max-height: 200px;
+    padding: 9px 0;
     border: 0;
     outline: 0;
+    resize: none;
+    overflow-y: auto;
     color: var(--pawly-text);
     background: transparent;
     font-size: 15px;
+    line-height: 22px;
 }
-.composer input::placeholder { color: #bfaeb6; }
+.composer textarea::placeholder { color: #bfaeb6; }
+
+.composer textarea {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    max-height: 200px;
+    padding: 9px 0;
+    border: 0;
+    outline: 0;
+    resize: none;
+    overflow-y: auto;
+    color: var(--pawly-text);
+    background: transparent;
+    font-size: 15px;
+    line-height: 22px;
+}
+.composer textarea::placeholder { color: #bfaeb6; }
+
 .composer-send {
     display: grid;
     place-items: center;

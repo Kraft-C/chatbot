@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
             if (!promptInput) return;
             promptInput.value = button.dataset.prompt;
+            promptInput.dispatchEvent(new Event("input"));
             promptInput.focus();
             promptInput.setSelectionRange(promptInput.value.length, promptInput.value.length);
         });
@@ -102,18 +103,59 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     } catch (e) {}
 
-    // ---- Chat : menu latéral sur mobile ----
+    // ---- Historique : confirmation avant suppression d'une conversation ----
+    document.querySelectorAll("form[data-confirm]").forEach((form) => {
+        form.addEventListener("submit", (event) => {
+            if (!window.confirm(form.dataset.confirm)) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    // ---- Chat : zone de saisie qui grandit ; Entrée envoie, Maj+Entrée = nouvelle ligne ----
+    document.querySelectorAll("textarea[name='prompt']").forEach((zone) => {
+        const ajuster = () => {
+            zone.style.height = "auto";
+            zone.style.height = Math.min(zone.scrollHeight, 200) + "px";
+        };
+        zone.addEventListener("input", ajuster);
+        zone.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+                event.preventDefault();
+                zone.form.requestSubmit(); // passe par l'envoi normal du formulaire
+            }
+        });
+        ajuster();
+    });
+
+    // ---- Chat : barre latérale rétractable (réduite sur ordinateur, menu sur mobile) ----
     const layout = document.querySelector("[data-chat-layout]");
     if (layout) {
         const toggle = layout.querySelector("[data-sidebar-toggle]");
-        const setOpen = (open) => {
-            layout.classList.toggle("is-sidebar-open", open);
-            if (toggle) toggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
+        const mobile = window.matchMedia("(max-width: 860px)");
+        const estOuverte = () => mobile.matches
+            ? layout.classList.contains("is-sidebar-open")
+            : !layout.classList.contains("is-sidebar-collapsed");
+        const majLabel = () => {
+            if (toggle) toggle.setAttribute("aria-label", estOuverte() ? "Fermer le menu" : "Ouvrir le menu");
         };
-        if (toggle) toggle.addEventListener("click", () => setOpen(!layout.classList.contains("is-sidebar-open")));
+        const setOpen = (open) => {
+            if (mobile.matches) {
+                layout.classList.toggle("is-sidebar-open", open);
+            } else {
+                layout.classList.toggle("is-sidebar-collapsed", !open);
+                try { localStorage.setItem("pawlySidebarReduite", open ? "0" : "1"); } catch (e) {}
+            }
+            majLabel();
+        };
+        try {
+            if (localStorage.getItem("pawlySidebarReduite") === "1") layout.classList.add("is-sidebar-collapsed");
+        } catch (e) {}
+        if (toggle) toggle.addEventListener("click", () => setOpen(!estOuverte()));
         layout.querySelectorAll("[data-sidebar-close]").forEach((el) => el.addEventListener("click", () => setOpen(false)));
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") setOpen(false);
+            if (event.key === "Escape" && mobile.matches) setOpen(false);
         });
+        majLabel();
     }
 });
