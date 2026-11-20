@@ -102,7 +102,9 @@
                     <div class="message-main">
                         <div class="message-author"
                              th:text="${isUser} ? 'Vous' : (${conversation.modeleIA?.nom} ?: 'PAWLY')"></div>
-                        <div class="message-content" th:text="${message.contenu}"></div>
+                        <!-- Code Remplacer pour que le chat s'affiche mot par mot
+                        <div class="message-content" th:text="${message.contenu}"></div>-->
+                        <div class="message-content" th:attr="data-message-assistant=${!isUser}" th:text="${message.contenu}"></div>
                     </div>
                 </div>
             </div>

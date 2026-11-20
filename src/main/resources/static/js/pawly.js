@@ -67,6 +67,41 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll("[data-chat-form].is-sending").forEach((form) => form.classList.remove("is-sending"));
     });
 
+    // ---- Chat : affichage progressif (ligne par ligne) de la dernière réponse de l'IA ----
+    // On mémorise l'envoi d'un message, puis on anime la réponse une fois la page rechargée.
+    // Le formulaire n'est pas intercepté : le chat continue de fonctionner normalement.
+    document.querySelectorAll("[data-chat-form]").forEach((form) => {
+        form.addEventListener("submit", () => {
+            if (form.checkValidity()) {
+                try { sessionStorage.setItem("pawlyAnimer", location.pathname); } catch (e) {}
+            }
+        });
+    });
+
+    try {
+        const aAnimer = sessionStorage.getItem("pawlyAnimer");
+        // Cas d'un nouveau message dans une conversation existante : même URL qu'avant l'envoi.
+        // Cas d'une nouvelle conversation : l'URL change, on anime donc dès qu'on est sur /conversations/{id}.
+        if (aAnimer && /^\/conversations\/\d+$/.test(location.pathname)) {
+            sessionStorage.removeItem("pawlyAnimer");
+            const reponses = document.querySelectorAll("[data-message-assistant='true']");
+            const derniere = reponses[reponses.length - 1];
+            if (derniere && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                const lignes = derniere.textContent.split("\n");
+                derniere.textContent = "";
+                let i = 0;
+                const afficherSuivante = () => {
+                    if (i >= lignes.length) return;
+                    derniere.textContent += (i > 0 ? "\n" : "") + lignes[i];
+                    i++;
+                    if (scrollZone) scrollZone.scrollTop = scrollZone.scrollHeight;
+                    setTimeout(afficherSuivante, 250); // délai entre deux lignes, en millisecondes
+                };
+                afficherSuivante();
+            }
+        }
+    } catch (e) {}
+
     // ---- Chat : menu latéral sur mobile ----
     const layout = document.querySelector("[data-chat-layout]");
     if (layout) {
