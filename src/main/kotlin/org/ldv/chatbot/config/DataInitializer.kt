@@ -49,7 +49,7 @@ class DataInitializer(
                 actif = true,
                 fournisseurIA = gemini,
                 description = "Modèle rapide et polyvalent.",
-                fourniseurIA = gemini,
+
                 cheminLogo = "/images/gemini.png"
             ),
 
@@ -60,7 +60,7 @@ class DataInitializer(
                 actif = true,
                 fournisseurIA = gemini,
                 description = "Modèle rapide pour les tâches simples.",
-                fourniseurIA = gemini,
+
                 cheminLogo = "/images/gemini.png"
             ),
 
@@ -71,7 +71,7 @@ class DataInitializer(
                 actif = true,
                 fournisseurIA = mistral,
                 description = "Modèle léger pour les conversations et les tâches courantes.",
-                fourniseurIA = mistral,
+
                 cheminLogo = "/images/mistral.png"
             ),
 
@@ -82,7 +82,7 @@ class DataInitializer(
                 actif = true,
                 fournisseurIA = mistral,
                 description = "Modèle plus avancé pour les tâches complexes.",
-                fourniseurIA = mistral,
+
                 cheminLogo = "/images/mistral.png"
             )
         )

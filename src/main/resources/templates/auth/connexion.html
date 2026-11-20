@@ -2,12 +2,15 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org"
       th:replace="~{base :: layout(~{::main}, 'PAWLY - Connexion')}">
 <body>
+<!--
+    CONTRAT AVEC ChatBotController :
+      - POST /connexion -> champs : email, password (rememberMe est envoyé mais ignoré pour l'instant)
+      - messages flash : erreur, information
+-->
 <main th:fragment="main" class="auth-page">
     <section class="auth-card">
-        <!-- À AJOUTER : place le logo/avatar de la maquette dans static/img/pawly-avatar.png -->
-        <img class="auth-avatar" th:src="@{/img/pawly-avatar.png}" alt="Avatar PAWLY"
-             onerror="this.style.display='none'">
-        <div class="auth-brand">PAWLY</div>
+        <span class="avatar avatar--lg"><img th:src="@{/img/pawly-avatar.png}" alt="Avatar PAWLY"></span>
+        <h1 class="wordmark wordmark--md">PAWLY</h1>
         <p class="auth-subtitle">Connectez-vous à votre compte</p>
 
         <div th:if="${erreur}" class="alert alert-danger pawly-alert" role="alert" th:text="${erreur}"></div>

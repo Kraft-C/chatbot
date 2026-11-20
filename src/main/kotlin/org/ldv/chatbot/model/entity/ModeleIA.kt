@@ -33,6 +33,6 @@ class ModeleIA(
     @OneToMany(mappedBy = "modeleIA", fetch = FetchType.LAZY)
     var conversations: MutableList<Conversation> = mutableListOf(),
     description: String,
-    fourniseurIA: FournisseurIA,
+
     cheminLogo: String
 )

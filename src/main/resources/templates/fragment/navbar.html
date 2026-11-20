@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+    Barre latérale du chat.
+    Utilise les variables du modèle fournies par ChatController :
+      - conversations : liste des conversations (la plus récente en premier)
+      - conversation  : conversation affichée (null sur la page d'accueil)
+-->
+<aside th:fragment="sidebar" class="sidebar" id="sidebar" aria-label="Navigation du chat">
+    <a class="sidebar-brand" th:href="@{/}" aria-label="PAWLY - Nouveau chat">
+        <span class="avatar avatar--md"><img th:src="@{/img/pawly-avatar.png}" alt="Avatar PAWLY"></span>
+        <span class="wordmark wordmark--sm">PAWLY</span>
+    </a>
+
+    <nav class="sidebar-nav">
+        <a th:href="@{/}" class="sidebar-link sidebar-link--primary">
+            <i class="bi bi-chat-dots"></i> Nouveau chat
+        </a>
+    </nav>
+
+    <div class="sidebar-section">
+        <h2 class="sidebar-section-title"><i class="bi bi-chat-left-text"></i> Mes conversations</h2>
+        <div class="conversation-list">
+            <a th:each="conv : ${conversations}"
+               th:href="@{/conversations/{id}(id=${conv.id})}"
+               th:text="${conv.titre}"
+               th:title="${conv.titre}"
+               th:classappend="${conversation != null and conversation.id == conv.id} ? 'is-active' : ''"
+               class="conversation-link">
+            </a>
+            <p class="conversation-empty" th:if="${conversations == null or conversations.isEmpty()}">
+                Aucune conversation pour le moment.
+            </p>
+        </div>
+    </div>
+
+    <div class="sidebar-bottom">
+        <a href="#" class="sidebar-link" aria-disabled="true" title="Bientôt disponible">
+            <i class="bi bi-gear"></i> Paramètres
+        </a>
+        <a href="#" class="sidebar-link" aria-disabled="true" title="Bientôt disponible">
+            <i class="bi bi-info-circle"></i> À propos
+        </a>
+    </div>
+</aside>
+</body>
+</html>

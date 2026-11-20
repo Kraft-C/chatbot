@@ -9,141 +9,123 @@
 
 <body>
 
-<main  class="chat-page flex-grow-1 d-flex">
+<!--
+    CONTRAT AVEC ChatController (ne pas modifier sans adapter le contrôleur) :
+      - variables du modèle : conversations, conversation (null à l'accueil), modeles, messages
+      - POST /conversations                  -> champs : idModele (obligatoire), prompt
+      - POST /conversations/{id}/messages    -> champ  : prompt
+    Le comportement JavaScript (suggestions, défilement, menu mobile) est dans /js/pawly.js
+    car seul le contenu de <main> est injecté dans le layout.
+-->
+<main class="chat-layout" data-chat-layout>
 
-    <!-- SIDEBAR (Navigation & Historique des conversations) -->
-    <aside class="sidebar d-flex flex-column p-3 border-end" style="width: 280px; min-width: 280px;">
-        <!-- Logo / Titre -->
-        <div class="sidebar-header mb-4 text-center">
-            <h2 class="text-danger fw-bold">PAWLY</h2>
-            <small class="text-muted">Votre compagnon IA, toujours à vos côtés !</small>
-        </div>
+    <!-- BARRE LATÉRALE : logo, nouveau chat, historique des conversations -->
+    <div th:replace="~{fragment/navbar :: sidebar}"></div>
+    <div class="sidebar-backdrop" data-sidebar-close></div>
 
-        <!-- Bouton Nouveau Chat -->
-        <a th:href="@{/}" class="btn btn-danger mb-3 d-flex align-items-center justify-content-center gap-2">
-            <i class="bi bi-plus-lg"></i> Nouveau chat
-        </a>
+    <!-- ZONE PRINCIPALE -->
+    <section class="chat-main">
 
-        <!-- Section Mes conversations -->
-        <div class="flex-grow-1 overflow-auto">
-            <h6 class="text-uppercase text-muted fs-7 mb-2">Mes conversations</h6>
-            <div class="list-group list-group-flush">
-                <a th:each="conv : ${conversations}"
-                   th:href="@{/conversations/{id}(id=${conv.id})}"
-                   th:text="${conv.titre}"
-                   th:classappend="${conversation != null and conversation.id == conv.id} ? 'active' : ''"
-                   class="list-group-item list-group-item-action text-truncate rounded mb-1">
+        <div class="chat-topbar">
+            <button type="button" class="icon-button sidebar-toggle" data-sidebar-toggle
+                    aria-controls="sidebar" aria-label="Ouvrir le menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="chat-topbar-actions">
+                <button type="button" class="icon-button" aria-label="Nouveautés" title="Bientôt disponible" disabled>
+                    <i class="bi bi-stars"></i>
+                </button>
+                <a class="icon-button" th:href="@{/connexion}" aria-label="Mon compte" title="Mon compte">
+                    <i class="bi bi-person"></i>
                 </a>
             </div>
         </div>
 
-        <!-- Paramètres / Bas de sidebar -->
-        <div class="sidebar-footer pt-3 border-top mt-auto">
-            <a href="#" class="text-decoration-none text-muted d-flex align-items-center gap-2">
-                <i class="bi bi-gear"></i> Paramètres
-            </a>
-        </div>
-    </aside>
+        <!-- Zone défilante : accueil OU historique des messages -->
+        <div class="chat-scroll" data-chat-scroll>
 
-    <!-- ZONE PRINCIPALE DU CHAT -->
-    <section class="flex-grow-1 d-flex flex-column bg-light" style="height: calc(100vh - 56px);">
-
-        <!-- Zone des messages / Accueil -->
-        <div class="flex-grow-1 overflow-auto p-4 d-flex flex-column">
-
-            <!-- CAS 1 : Aucune conversation sélectionnée (Page d'accueil) -->
-            <div th:if="${conversation == null}" class="text-center my-auto">
-                <h1 class="fw-bold mb-2">PAWLY</h1>
-                <h3 class="mb-3">Comment puis-je vous aider ?</h3>
-                <p class="text-muted mb-4">
-                    Choisissez un modèle IA et posez votre question ci-dessous.
-                </p>
-
-                <!-- Suggestions rapides -->
-                <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPrompt('Explique-moi ce code')">
-                        &lt;/&gt; Explique-moi ce code
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPrompt('Donne-moi des idées')">
-                        💡 Donne-moi des idées
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setPrompt('Aide-moi à apprendre')">
-                        📚 Aide-moi à apprendre
-                    </button>
+            <!-- CAS 1 : aucune conversation sélectionnée (page d'accueil + création) -->
+            <div th:if="${conversation == null}" class="chat-welcome">
+                <svg class="welcome-paw" viewBox="0 0 64 64" aria-hidden="true"><use href="#pawly-paw"/></svg>
+                <h1 class="wordmark wordmark--xl">PAWLY</h1>
+                <p class="chat-welcome-tagline">Votre compagnon IA, toujours à vos côtés !</p>
+                <div class="welcome-divider" aria-hidden="true">
+                    <svg class="paw-icon" viewBox="0 0 64 64"><use href="#pawly-paw"/></svg>
                 </div>
-            </div>
 
-            <!-- CAS 2 : Historique des messages de la conversation active -->
-            <div th:if="${conversation != null}" class="chat-messages-container w-75 mx-auto">
-                <div th:each="message : ${messages}" class="mb-4">
-                    <div class="d-flex align-items-center mb-1">
-                        <strong th:text="${message.typeMessage.name() == 'UTILISATEUR'} ? 'Vous' : ${conversation.modeleIA.nom}"></strong>
-                    </div>
-                    <div class="message p-3 rounded bg-white shadow-sm message-content"
-                         th:text="${message.contenu}" style="white-space: pre-wrap;">
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ZONE DE SAISIE DU PROMPT (Fixe en bas) -->
-        <div class="p-3 bg-white border-top">
-            <div class="w-75 mx-auto">
-
-                <!-- Formulaire si on est sur l'accueil (Création de conversation) -->
-                <form th:if="${conversation == null}" th:action="@{/conversations}" method="post" class="d-flex flex-column gap-2">
-                    <div class="d-flex gap-2">
-                        <!-- Sélecteur de modèle IA -->
-                        <select name="idModele" class="form-select w-auto" required>
+                <form th:action="@{/conversations}" method="post" class="composer-form" data-chat-form>
+                    <!-- Sélecteur de modèle IA (requis par le contrôleur : idModele) -->
+                    <div class="model-picker">
+                        <i class="bi bi-cpu" aria-hidden="true"></i>
+                        <label class="visually-hidden" for="idModele">Modèle IA</label>
+                        <select id="idModele" name="idModele" required>
                             <option value="" disabled selected>Choisissez un modèle IA...</option>
                             <option th:each="modele : ${modeles}"
                                     th:value="${modele.id}"
                                     th:text="${modele.nom}"></option>
                         </select>
                     </div>
-                    <div class="input-group">
-                        <input type="text" id="promptInput" name="prompt" class="form-control" placeholder="Posez votre question à PAWLY..." required autocomplete="off">
-                        <button class="btn btn-danger px-4" type="submit">
-                            <i class="bi bi-arrow-right"></i> &gt;
+                    <div class="composer">
+                        <label class="visually-hidden" for="promptInput">Votre question</label>
+                        <input type="text" id="promptInput" name="prompt"
+                               placeholder="Posez votre question à PAWLY..." required autocomplete="off">
+                        <button class="composer-send" type="submit" aria-label="Envoyer">
+                            <i class="bi bi-arrow-right"></i>
                         </button>
                     </div>
                 </form>
 
-                <!-- Formulaire si on est dans une conversation existante -->
-                <form th:if="${conversation != null}" th:action="@{/conversations/{id}/messages(id=${conversation.id})}" method="post">
-                    <div class="input-group">
-                        <input type="text" id="promptInput" name="prompt" class="form-control" placeholder="Posez votre question à PAWLY..." required autocomplete="off">
-                        <button class="btn btn-danger px-4" type="submit">
-                            <i class="bi bi-arrow-right"></i> &gt;
-                        </button>
-                    </div>
-                </form>
-
+                <!-- Suggestions rapides : remplissent le champ #promptInput (voir pawly.js) -->
+                <div class="suggestions">
+                    <button type="button" class="suggestion" data-prompt="Explique-moi ce code">
+                        <i class="bi bi-code-slash"></i> Explique-moi ce code
+                    </button>
+                    <button type="button" class="suggestion" data-prompt="Donne-moi des idées">
+                        <i class="bi bi-lightbulb"></i> Donne-moi des idées
+                    </button>
+                    <button type="button" class="suggestion" data-prompt="Aide-moi à apprendre">
+                        <i class="bi bi-mortarboard"></i> Aide-moi à apprendre
+                    </button>
+                </div>
             </div>
+
+            <!-- CAS 2 : historique des messages de la conversation active -->
+            <div th:if="${conversation != null}" class="chat-messages">
+                <div th:each="message : ${messages}"
+                     th:with="isUser=${message.typeMessage.name() == 'UTILISATEUR'}"
+                     th:classappend="${isUser} ? 'message--user' : 'message--assistant'"
+                     class="message">
+                    <span th:if="${isUser}" class="message-avatar" aria-hidden="true"><i class="bi bi-person"></i></span>
+                    <span th:unless="${isUser}" class="message-avatar avatar" aria-hidden="true">
+                        <img th:src="@{/img/pawly-avatar.png}" alt="">
+                    </span>
+                    <div class="message-main">
+                        <div class="message-author"
+                             th:text="${isUser} ? 'Vous' : (${conversation.modeleIA?.nom} ?: 'PAWLY')"></div>
+                        <div class="message-content" th:text="${message.contenu}"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ZONE DE SAISIE fixe en bas : uniquement dans une conversation existante -->
+        <div th:if="${conversation != null}" class="chat-dock">
+            <form th:action="@{/conversations/{id}/messages(id=${conversation.id})}" method="post"
+                  class="composer-form" data-chat-form>
+                <div class="composer">
+                    <label class="visually-hidden" for="promptInput">Votre message</label>
+                    <input type="text" id="promptInput" name="prompt"
+                           placeholder="Posez votre question à PAWLY..." required autocomplete="off">
+                    <button class="composer-send" type="submit" aria-label="Envoyer">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
         </div>
 
     </section>
 </main>
-
-<!-- Script optionnel pour injecter les suggestions rapides dans l'input -->
-<script>
-    function setPrompt(text) {
-        const input = document.getElementById('promptInput');
-        if (input) {
-            input.value = text;
-            input.focus();
-        }
-    }
-
-    // Scroll automatique vers le bas de la zone de message si présent
-    window.addEventListener('DOMContentLoaded', () => {
-        const chatContainer = document.querySelector('.overflow-auto');
-        if (chatContainer) {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-    });
-</script>
 
 </body>
 </html>

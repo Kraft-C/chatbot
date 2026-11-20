@@ -1,7 +1,6 @@
 package org.ldv.chatbot.service
 
 import org.ldv.chatbot.model.entity.ModeleIA
-import org.ldv.chatbot.service.IAService
 import org.springframework.stereotype.Component
 
 @Component
