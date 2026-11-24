@@ -16,6 +16,13 @@
             <i class="bi bi-person"></i>
         </a>
     </div>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn btn-danger">
+            Déconnexion
+        </button>
+    </form>
+
 </header>
 </body>
 </html>

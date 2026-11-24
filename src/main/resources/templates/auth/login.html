@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main}, 'PAWLY - connexion')}">
+<body>
+<main th:fragment="main" class="page-container">
+    <section class="content-card">
+        <h1>Titre de la page</h1>
+        <p>Utilise ce fichier comme point de départ pour créer une nouvelle page PAWLY.</p>
+    </section>
+
+
+<!-- Formulaire de connexion -->
+<section class="login-card">
+
+    <div class="login-heading">
+        <h2>Bienvenue</h2>
+        <p>Connectez-vous à votre espace personnel</p>
+    </div>
+
+    <!-- Identifiants incorrects -->
+    <div th:if="${param.error}"
+         class="alert alert-danger"
+         role="alert">
+        Adresse e-mail ou mot de passe incorrect,
+        ou compte désactivé.
+    </div>
+
+    <!-- Déconnexion réussie -->
+    <div th:if="${param.logout}"
+         class="alert alert-success"
+         role="status">
+        Vous avez été déconnecté avec succès.
+    </div>
+
+    <form th:action="@{/login}"
+          method="post">
+
+        <!-- Adresse e-mail -->
+        <div class="mb-3">
+            <label for="email"
+                   class="form-label">
+                Adresse e-mail
+            </label>
+
+            <input type="email"
+                   class="form-control login-input"
+                   id="email"
+                   name="email"
+                   placeholder="Votre adresse e-mail"
+                   autocomplete="username"
+                   required
+                   autofocus>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="mb-4">
+            <label for="password"
+                   class="form-label">
+                Mot de passe
+            </label>
+
+            <input type="password"
+                   class="form-control login-input"
+                   id="password"
+                   name="password"
+                   placeholder="Votre mot de passe"
+                   autocomplete="current-password"
+                   required>
+        </div>
+
+        <button type="submit"
+                class="btn login-submit w-100">
+            Se connecter
+        </button>
+    </form>
+
+    <div class="login-information">
+        <p>
+            Vous ne possédez pas de compte ?
+            Contactez votre administrateur.
+        </p>
+    </div>
+
+</section>
+</main>
+</body>
+</html>

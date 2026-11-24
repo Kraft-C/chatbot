@@ -20,14 +20,18 @@ class Utilisateur(
     var email: String,
 
     @Column(nullable = false)
-    var motDePasse: String,
+    var motDePasse: String?,
 
     @OneToMany(
         mappedBy = "utilisateur",
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     )
-    var conversations: MutableList<Conversation> = mutableListOf()
+    var conversations: MutableList<Conversation> = mutableListOf(),
+    var prenom: String,
+    @ManyToOne
+    @JoinColumn("role_id")
+    var role: Role
 ) {
     fun creerConversation(titre: String, modeleIA: ModeleIA? = null): Conversation {
         val conversation = Conversation(
