@@ -13,6 +13,32 @@
         <span class="wordmark wordmark--sm">PAWLY</span>
     </a>
 
+    <div class="" th:if="${utilisateur != null}">
+
+
+
+
+<span th:text="${utilisateur != null
+   ? utilisateur.prenom + ' ' + utilisateur.nom
+   : 'Anonyme'}">
+   Anonyme
+</span>
+
+
+   <br>
+
+
+   <small th:text="${utilisateur != null
+   ? utilisateur.role.nom
+   : 'Visiteur'}">
+       Visiteur
+   </small>
+
+
+
+
+    </div>
+
     <nav class="sidebar-nav">
         <a th:href="@{/}" class="sidebar-link sidebar-link--primary">
             <i class="bi bi-chat-dots"></i> Nouveau chat

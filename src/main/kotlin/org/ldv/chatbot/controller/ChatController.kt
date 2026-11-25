@@ -3,11 +3,15 @@ package org.ldv.chatbot.controller
 import org.ldv.chatbot.model.dao.ConversationDAO
 import org.ldv.chatbot.model.dao.MessageDAO
 import org.ldv.chatbot.model.dao.ModeleIADAO
+import org.ldv.chatbot.model.dao.UtilisateurDAO
 import org.ldv.chatbot.model.entity.Conversation
 import org.ldv.chatbot.model.entity.Message
 import org.ldv.chatbot.model.entity.TypeMessage
+import org.ldv.chatbot.model.entity.Utilisateur
 import org.ldv.chatbot.service.IAServiceFactory
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,12 +26,17 @@ class ChatController(
     private val iaServiceFactory: IAServiceFactory,
     private val conversationDAO: ConversationDAO,
     private val messageDAO: MessageDAO,
-    private val modeleIADAO: ModeleIADAO
+    private val modeleIADAO: ModeleIADAO,
+    private val utilisateurDAO: UtilisateurDAO
 ) {
 
     // Page d'accueil : liste des conversations
     @GetMapping("/", "/chat")
-    fun accueil(model: Model): String {
+    fun accueil(model: Model, authentication: Authentication): String {
+        //Recupere l'utilisateur de la session
+        val utilisateur = this.getUtilisateurConnecte(authentication)
+        // Ajout de l'utilisateur à la vue
+        model.addAttribute("utilisateur", utilisateur)
 
         // Retire la conversation courante
         model.addAttribute("conversation", null)
@@ -35,7 +44,7 @@ class ChatController(
         model.addAttribute("messages", emptyList<Message>())
         model.addAttribute(
             "conversations",
-            conversationDAO.findAllByOrderByDateDerniereModificationDesc()
+            conversationDAO.findAllByUtilisateurOrderByDateDerniereModificationDesc(utilisateur)
         )
 
         return "utilisateur/chat"
@@ -45,8 +54,11 @@ class ChatController(
     @PostMapping("/conversations")
     fun creerConversation(
         @RequestParam prompt: String,
-        @RequestParam idModele: Long
+        @RequestParam idModele: Long,
+        authentication: Authentication
     ): String {
+        // Recupere l'utilisateur
+        val utilisateur = this.getUtilisateurConnecte(authentication)
 
         // Récupération du modèle sélectionné
         val modele = modeleIADAO.findById(idModele)
@@ -61,7 +73,8 @@ class ChatController(
         val conversation = Conversation(
             titre = prompt.take(50),
             dateCreation = LocalDateTime.now(),
-            modeleIA = modele
+            modeleIA = modele,
+            utilisateur = utilisateur
         )
 
         val conversationEnregistree =
@@ -109,15 +122,22 @@ class ChatController(
     @GetMapping("/conversations/{id}")
     fun afficherConversation(
         @PathVariable id: Long,
-        model: Model
+        model: Model,
+        authentication: Authentication
     ): String {
+        //Recupere l'utilisateur
+        val utilisateur = this.getUtilisateurConnecte(authentication)
+        model.addAttribute("utilisateur", utilisateur)
 
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+        val conversation = conversationDAO
+            .findByIdAndUtilisateur(id, utilisateur)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation introuvable")
 
         model.addAttribute(
             "conversations",
-            conversationDAO.findAllByOrderByDateDerniereModificationDesc()
+            conversationDAO.findAllByUtilisateurOrderByDateDerniereModificationDesc(
+                utilisateur
+            )
         )
 
         model.addAttribute("conversation", conversation)
@@ -133,11 +153,14 @@ class ChatController(
     @PostMapping("/conversations/{id}/messages")
     fun envoyerMessage(
         @PathVariable id: Long,
-        @RequestParam prompt: String
+        @RequestParam prompt: String,
+        authentication: Authentication
     ): String {
+        val utilisateur = this.getUtilisateurConnecte(authentication)
 
-        val conversation = conversationDAO.findById(id)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
+        val conversation = conversationDAO
+            .findByIdAndUtilisateur(id, utilisateur)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Conversation introuvable")
 
         // Enregistrement du message utilisateur
         val messageUtilisateur = Message(
@@ -187,6 +210,14 @@ class ChatController(
         conversationDAO.deleteById(id)
 
         return "redirect:/"
+    }
+
+    fun getUtilisateurConnecte(authentication: Authentication): Utilisateur {
+        val email = authentication.name
+        val utilisateur = utilisateurDAO
+            .findByEmailIgnoreCase(email)
+            ?: throw UsernameNotFoundException("Utilisateur introuvable")
+        return utilisateur
     }
 }
 
