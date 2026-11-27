@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main}, 'Ajouter un modèle IA')}">
+<body>
+<main th:fragment="main" class="page-container">
+  <div class="container mt-4">
+    <h1>Ajouter un modèle IA</h1>
+    <form method="post"
+          th:action="@{/admin/modeles-ia}">
+      <div class="mb-3">
+        <label for="nom" class="form-label">Nom du modèle</label>
+        <input type="text" id="nom" name="nom" class="form-control"
+               required>
+      </div>
+      <div class="mb-3">
+        <label for="fourniseurIAId" class="form-label">
+          Fournisseur IA</label>
+        <select id="fourniseurIAId" name="fourniseurIAId"
+                class="form-select" required>
+          <option value="">Sélectionnez un fournisseur</option>
+          <option th:each="fourniseur : ${fourniseursIA}"
+                  th:value="${fourniseur.id}" th:text="${fourniseur.nom}">
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="urlAPI" class="form-label">URL de l'API</label>
+        <input type="url" id="urlAPI" name="urlAPI" class="form-control"
+               required>
+      </div>
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="description" rows="4"
+                  class="form-control">
+        </textarea>
+      </div>
+      <div class="mb-3">
+        <label for="cheminLogo" class="form-label">Chemin du logo</label>
+        <input type="text" id="cheminLogo" name="cheminLogo"
+               class="form-control">
+      </div>
+      <button type="submit" class="btn btn-success">Créer</button>
+      <a th:href="@{/admin/modeles-ia}" class="btn btn-secondary">
+        Annuler</a>
+    </form>
+  </div>
+</main>
+</body>
+</html>

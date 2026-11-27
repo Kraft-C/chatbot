@@ -21,8 +21,12 @@ class FournisseurIA(
         cascade = [CascadeType.PERSIST, CascadeType.MERGE]
     )
     var modelesIA: MutableList<ModeleIA> = mutableListOf(),
-    cheminLogo: String,
-    description: String
+
+    @Column(nullable = true)
+    var cheminLogo: String? = null,
+
+    @Column(nullable = true)
+    var description: String? = null
 ) {
     fun ajouterModele(modele: ModeleIA) {
         modelesIA.add(modele)

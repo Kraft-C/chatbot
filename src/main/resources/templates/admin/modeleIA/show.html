@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main}, 'Détails du modèle IA')}">
+<body>
+<main th:fragment="main" class="page-container">
+  <div class="container mt-4">
+    <h1>Détails du modèle IA</h1>
+    <div class="card">
+      <div class="card-header"><h2 th:text="${modeleIA.nom}"></h2></div>
+      <div class="card-body">
+        <img th:if="${!#strings.isEmpty(modeleIA.cheminLogo)}"
+             th:src="@{${modeleIA.cheminLogo}}" alt="Logo" width="100">
+        <dl class="row">
+          <dt class="col-sm-3">Identifiant</dt>
+          <dd class="col-sm-9" th:text="${modeleIA.id}"></dd>
+          <dt class="col-sm-3">Nom</dt>
+          <dd class="col-sm-9" th:text="${modeleIA.nom}"></dd>
+          <dt class="col-sm-3">Fournisseur</dt>
+          <dd class="col-sm-9"
+              th:text="${modeleIA.fournisseurIA?.nom}"></dd>
+          <dt class="col-sm-3">URL API</dt>
+          <dd class="col-sm-9" th:text="${modeleIA.urlAPI}"></dd>
+          <dt class="col-sm-3">Description</dt>
+          <dd class="col-sm-9" th:text="${modeleIA.description}"></dd>
+        </dl>
+        <a class="btn btn-warning"
+           th:href="@{/admin/modeles-ia/{id}/edit(id=${modeleIA.id})}">
+          Modifier</a>
+        <a class="btn btn-secondary" th:href="@{/admin/modeles-ia}">
+          Retour à la liste</a>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

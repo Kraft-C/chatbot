@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <!-- En-tête des pages classiques (affiché quand showHeader = true). Le chat et la connexion ont leur propre mise en page. -->
 <header th:fragment="header" class="app-header">
@@ -10,6 +10,9 @@
     <nav class="header-nav" aria-label="Navigation principale">
         <a class="header-link" th:href="@{/chat}">Chat</a>
         <a class="header-link" th:href="@{/connexion}">Connexion</a>
+        <div sec:authorize="hasRole('ADMIN')">
+            <a class="header-link" th:href="@{/admin/modeles-ia}">Gestion des modèles IA</a>
+        </div>
     </nav>
     <div class="header-actions">
         <a class="icon-button" th:href="@{/connexion}" aria-label="Profil" title="Profil">

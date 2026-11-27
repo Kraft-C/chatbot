@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main}, 'Modifier un modèle IA')}">
+<body>
+<main th:fragment="main" class="page-container">
+  <div class="container mt-4">
+    <h1>Modifier un modèle IA</h1>
+    <form method="post"
+          th:action="@{/admin/modeles-ia/{id}(id=${modeleIA.id})}">
+      <input type="hidden" name="_method" value="PUT">
+      <div class="mb-3">
+        <label for="nom" class="form-label">Nom du modèle</label>
+        <input type="text" id="nom" name="nom" class="form-control"
+               th:value="${modeleIA.nom}" required>
+      </div>
+      <div class="mb-3">
+        <label for="fourniseurIAId" class="form-label">
+          Fournisseur IA</label>
+        <select id="fourniseurIAId" name="fourniseurIAId"
+                class="form-select" required>
+          <option value="">Sélectionnez un fournisseur</option>
+          <option th:each="fourniseur : ${fourniseursIA}"
+                  th:value="${fourniseur.id}" th:text="${fourniseur.nom}"
+                  th:selected="${modeleIA.fournisseurIA?.id
+                                 == fourniseur.id}">
+          </option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="urlAPI" class="form-label">URL de l'API</label>
+        <input type="url" id="urlAPI" name="urlAPI" class="form-control"
+               th:value="${modeleIA.urlAPI}" required>
+      </div>
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="description" rows="4"
+                  class="form-control" th:text="${modeleIA.description}">
+        </textarea>
+      </div>
+      <div class="mb-3">
+        <label for="cheminLogo" class="form-label">Chemin du logo</label>
+        <input type="text" id="cheminLogo" name="cheminLogo"
+               class="form-control" th:value="${modeleIA.cheminLogo}">
+      </div>
+      <button type="submit" class="btn btn-success">
+        Enregistrer les modifications</button>
+      <a th:href="@{/admin/modeles-ia}" class="btn btn-secondary">
+        Annuler</a>
+    </form>
+  </div>
+</main>
+</body>
+</html>

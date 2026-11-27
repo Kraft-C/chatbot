@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <!--
     Barre latérale du chat.
@@ -14,45 +14,31 @@
     </a>
 
     <div class="" th:if="${utilisateur != null}">
-
-
-
-
 <span th:text="${utilisateur != null
    ? utilisateur.prenom + ' ' + utilisateur.nom
    : 'Anonyme'}">
    Anonyme
 </span>
-
-
    <br>
-
-
    <small th:text="${utilisateur != null
    ? utilisateur.role.nom
    : 'Visiteur'}">
        Visiteur
    </small>
-
-
-
-
     </div>
 
     <nav class="sidebar-nav">
         <a th:href="@{/}" class="sidebar-link sidebar-link--primary">
             <i class="bi bi-chat-dots"></i> Nouveau chat
-            <a th:href="@{/connexion}" class="sidebar-link">
-                <i class="bi bi-person"></i> Connexion
-            </a>
+        </a>
+        <a th:href="@{/connexion}" class="sidebar-link">
+            <i class="bi bi-person"></i> Connexion
         </a>
     </nav>
 
     <div class="sidebar-section">
         <h2 class="sidebar-section-title"><i class="bi bi-chat-left-text"></i> Mes conversations</h2>
         <div class="conversation-list">
-            <!-- remplacer par la div de en dessous
-            <a th:each="conv : ${conversations}"-->
             <div class="conversation-list">
                 <div th:each="conv : ${conversations}" class="conversation-item">
                     <a th:href="@{/conversations/{id}(id=${conv.id})}"
@@ -76,6 +62,12 @@
     </div>
 
     <div class="sidebar-bottom">
+        <div sec:authorize="hasRole('ADMIN')">
+            <h6 class="sidebar-section-title"><i class="bi bi-shield-lock"></i> Administration</h6>
+            <a th:href="@{/admin/modeles-ia}" class="sidebar-link">
+                <i class="bi bi-cpu"></i> Gestion des modèles IA
+            </a>
+        </div>
         <a href="#" class="sidebar-link" aria-disabled="true" title="Bientôt disponible">
             <i class="bi bi-gear"></i> Paramètres
         </a>

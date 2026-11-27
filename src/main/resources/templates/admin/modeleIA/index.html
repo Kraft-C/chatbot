@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base :: layout(~{::main}, 'Gestion des modèles IA')}">
+<body>
+<main th:fragment="main" class="page-container">
+  <div class="container mt-4">
+    <h1>Gestion des modèles IA</h1>
+    <a th:href="@{/admin/modeles-ia/create}"
+       class="btn btn-primary mb-3">Ajouter un modèle IA</a>
+    <div th:if="${succes}" th:text="${succes}"
+         class="alert alert-success"></div>
+    <div th:if="${erreur}" th:text="${erreur}"
+         class="alert alert-danger"></div>
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nom</th><th>Fournisseur</th>
+          <th>Description</th><th>URL API</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="modeleIA : ${modelesIA}">
+          <td th:text="${modeleIA.id}"></td>
+          <td th:text="${modeleIA.nom}"></td>
+          <td th:text="${modeleIA.fournisseurIA?.nom}"></td>
+          <td th:text="${modeleIA.description}"></td>
+          <td th:text="${modeleIA.urlAPI}"></td>
+          <td>
+            <a class="btn btn-info btn-sm"
+               th:href="@{/admin/modeles-ia/{id}(id=${modeleIA.id})}">
+              Consulter</a>
+            <a class="btn btn-warning btn-sm"
+               th:href="@{/admin/modeles-ia/{id}/edit(id=${modeleIA.id})}">
+              Modifier</a>
+            <form method="post" class="d-inline"
+                  th:action="@{/admin/modeles-ia/{id}(id=${modeleIA.id})}"
+                  onsubmit="return confirm('Supprimer ce modèle IA ?')">
+              <input type="hidden" name="_method" value="DELETE">
+              <button type="submit" class="btn btn-danger btn-sm">
+                Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p th:if="${#lists.isEmpty(modelesIA)}">Aucun modèle IA.</p>
+  </div>
+</main>
+</body>
+</html>

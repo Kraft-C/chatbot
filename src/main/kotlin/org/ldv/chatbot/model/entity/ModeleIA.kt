@@ -15,8 +15,8 @@ class ModeleIA(
     @Column(nullable = false)
     var nom: String,
 
-    @Column(nullable = false, unique = true)
-    var identifiantAPI: String,
+    @Column(nullable = true)
+    var identifiantAPI: String = nom,
 
     @Column(nullable = false)
     var urlAPI: String,
@@ -32,7 +32,13 @@ class ModeleIA(
     // Un même modèle IA peut être utilisé dans plusieurs conversations.
     @OneToMany(mappedBy = "modeleIA", fetch = FetchType.LAZY)
     var conversations: MutableList<Conversation> = mutableListOf(),
-    description: String,
 
-    cheminLogo: String
-)
+    @Column(nullable = true)
+    var description: String? = null,
+
+    @Column(nullable = true)
+    var cheminLogo: String? = null
+) {
+    val fourniseurIA: FournisseurIA
+        get() = fournisseurIA
+}

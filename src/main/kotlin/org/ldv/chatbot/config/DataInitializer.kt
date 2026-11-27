@@ -136,6 +136,17 @@ class DataInitializer(
                     motDePasse = passwordEncoder.encode("user123"),
                     role = roleUser)
             )
+
+            utilisateurDAO.save(
+                Utilisateur(
+                    prenom = "Clément",
+                    nom = "Kraft",
+                    email = "clementkraft77160@gmail.com",
+                    motDePasse = passwordEncoder.encode("123"),
+                    role = roleAdmin
+                )
+            )
+
         }
 
     }
